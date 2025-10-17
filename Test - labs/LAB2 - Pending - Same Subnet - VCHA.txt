@@ -1,0 +1,84 @@
+VMW - Thực tế nhưng cần Router hoặc thiết bị chuyen dung de 
+cac mang thay nhau -> STOP THIS LAB
+
+#note: chưa cấu hình xong
+
+==============================================================
+
+--------------------------------------------------------------
+ESXI-MGNT
+Short name: esxi.lab.local
+  IP: 10.10.10.21
+  VLAN: 10 (Management)
+
+	------------------------------------------------------
+	vCenter Server:
+	  Hostname: vcenter.lab.local
+	  Short name: vcenter.lab.local
+	  IP: 10.10.10.10
+	  VLAN: 10 (Management)
+
+	Network:
+	  Gateway: 10.10.10.51
+	  Subnet: 10.10.10.0/24
+	------------------------------------------------------
+
+Network:
+  Gateway: 10.10.10.1
+  Subnet: 10.10.10.0/24
+  VMnet8 (NAT)
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+DNS Server:
+  Hostname: dns-01.lab.local
+  Short name: dns1.lab.local
+  IP: 10.10.10.51
+
+Network:
+  Gateway: 10.10.10.1
+  Subnet: 10.10.10.0/24
+  VMnet8 (NAT)
+
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+ESXi Host 1:
+  Hostname: hcm-esxi-test.lab.local
+  Short name: hcm1.lab.local
+  IP: 10.10.10.22
+
+Network:
+  Gateway: 10.10.10.1
+  Subnet: 10.10.10.0/24
+  VMnet8 (NAT)
+
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+ESXi Host 2:
+  Hostname: hn-esxi-test.lab.local
+  Short name: hn1.lab.local
+  IP: 10.10.10.23
+
+Network:
+  Gateway: 10.10.10.51
+  Subnet: 10.30.10.0/24
+  VMnet8 (NAT)
+
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+ESXi Host 3:
+  Hostname: dn-esxi-test.lab.local
+  Short name: dn1.lab.local
+  IP: 10.10.10.24
+
+Network:
+  Gateway: 10.10.10.51
+  Subnet: 10.30.10.0/24
+  VMnet8 (NAT)
+
+--------------------------------------------------------------
+
+===============================================================
