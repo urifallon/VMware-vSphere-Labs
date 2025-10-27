@@ -1,8 +1,3 @@
-Chào bạn, đây là phiên bản README đã được tối ưu hóa, tập trung vào sự rõ ràng, mạch lạc và giúp người học dễ dàng điều hướng kho lưu trữ.
-
-Phiên bản này được viết dựa trên giả định rằng các chi tiết của mỗi bài lab (như "Yêu cầu chi tiết", "Kết quả mong đợi") sẽ được đặt trong các file `.md` riêng biệt (ví dụ: `labs/part-1/lab-1a.md`), và README này đóng vai trò là **trang chủ và mục lục** chính.
-
------
 
 # 📘 Hướng dẫn Lab về Khả năng Mở rộng của vSphere
 
