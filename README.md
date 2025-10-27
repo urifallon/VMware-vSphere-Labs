@@ -1,5 +1,74 @@
 # 📘 vSphere Scalability Lab Guide
 
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│                           [ MANAGEMENT LAYER ]                             │
+│────────────────────────────────────────────────────────────────────────────│
+│  vCenter Server                                                            │
+│     ├─ Quản lý tập trung tất cả các ESXi Hosts                             │
+│     ├─ Tạo / Giám sát Cluster                                              │
+│     ├─ Cấu hình tài nguyên (DRS, HA, vSAN, vDS, vMotion, ...)              │
+│     └─ Cung cấp API, PowerCLI, SSO, Role-Based Access Control              │
+└────────────────────────────────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                              [ CLUSTER LEVEL ]                             │
+│────────────────────────────────────────────────────────────────────────────│
+│  Cluster (ESXi1, ESXi2, ..., ESXin)                                        │
+│     ├─ Tổng hợp tài nguyên vật lý (CPU, RAM, Disk, NIC)                    │
+│     ├─ Cho phép tính năng DRS (Dynamic Resource Scheduler)                 │
+│     ├─ Cho phép HA (High Availability)                                     │
+│     ├─ Cho phép vMotion / Storage vMotion                                  │
+│     └─ Kết nối đến Datastore, vSAN, và Virtual Networks                    │
+└────────────────────────────────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                             [ COMPUTE LAYER ]                              │
+│────────────────────────────────────────────────────────────────────────────│
+│  Virtual Machines (VMs)                                                    │
+│     ├─ Sử dụng CPU & RAM được phân bổ từ ESXi                              │
+│     ├─ Hỗ trợ snapshot, clone, template                                    │
+│     ├─ Chạy OS (Linux, Windows, Appliance, vCSA, vROps, vCenter ...)       │
+│     └─ DRS tự động cân bằng tải CPU/RAM giữa các host                      │
+└────────────────────────────────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                             [ NETWORK LAYER ]                              │
+│────────────────────────────────────────────────────────────────────────────│
+│  vSphere Distributed Switch (vDS)                                          │
+│     ├─ Distributed Port Groups (App, DB, Mgmt, vMotion...)                 │
+│     ├─ VLAN Tagging (VLAN 10, 20, 30...)                                   │
+│     ├─ Uplink Groups (NIC0..NICn) kết nối vật lý tới Switch thật           │
+│     ├─ Load Balancing / Failover                                           │
+│     └─ Hỗ trợ Network I/O Control, vMotion traffic, Management traffic     │
+└────────────────────────────────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                             [ STORAGE LAYER ]                              │
+│────────────────────────────────────────────────────────────────────────────│
+│  vSAN / Datastore / iSCSI / NFS                                            │
+│     ├─ vSAN: chia sẻ dung lượng local disk của các host                    │
+│     ├─ Datastore: nơi lưu file VM (.vmdk, .vmx, snapshot, ISO)             │
+│     ├─ iSCSI / NFS: lưu trữ mạng ngoài (NAS / SAN)                         │
+│     └─ Storage Policies: xác định replication, caching, performance        │
+└────────────────────────────────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                    [ SECURITY & AUTOMATION LAYER ]                         │
+│────────────────────────────────────────────────────────────────────────────│
+│  - SSO (Single Sign-On)                                                    │
+│  - Role-Based Access Control (RBAC)                                        │
+│  - Certificates, Trust, Audit Logs                                         │
+│  - PowerCLI / API / vRealize Automation                                    │
+│  - Backup & Restore (vSphere Replication, Veeam, ...)                      │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
 ## 🧠 PHẦN 1 – Course Introduction & Environment Setup
 
 ### 🧩 Lab 1A – Hiểu bản chất môi trường vSphere

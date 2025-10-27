@@ -130,4 +130,3 @@ Việc lựa chọn giữa vSS và vDS nên dựa trên **quy mô hệ thống**
 
 --- 
 
-> 📌 **Ghi chú**: Tài liệu này được viết theo định dạng Markdown (`.md`) và có thể dùng trực tiếp trong Git, Confluence (chế độ Markdown), hoặc chuyển đổi sang PDF/HTML dễ dàng.
