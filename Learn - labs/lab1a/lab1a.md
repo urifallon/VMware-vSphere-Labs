@@ -10,11 +10,11 @@
 
 ## II. Thiết lập
 
-### 1. Cài đặt máy ảo ESXi
+### 1. Cài đặt máy ảo ESXi 
 
 ![Bước 1](/img/lab1a-buoc1.png)
 
-### 2. Thiết lập mạng trong VM
+### 2. Thiết lập trong VM
 
 ![Bước 2](/img/lab1a-buoc2.png)
 
@@ -179,7 +179,88 @@
 **Configure CEIP:**
 → `Next` → `Finish`
 
+### 4. Hoàn tất cài đặt và cấu hình vCenter
+
+![Bước 18](/img/lab1a-buoc18.png)
+
+**Lưu ý:** Đợi đến khi cài đặt hoàn tất
+
+![Bước 19](/img/lab1a-buoc19.png)
+
+**Truy cập vSphere Client:**
+- Sau khi cài đặt xong, vào trang quản trị vSphere bằng domain (IP address bạn đã đặt cho vSphere, ví dụ: `https://10.10.10.10/`)
+- Đợi đến khi cài đặt hoàn tất
+- Click `Launch Vsphere Client`
+
+![Bước 20](/img/lab1a-buoc20.png)
+
+**Tạo datacenter mới:** Right Click `vcenter.lab.local`
+
+![Bước 21](/img/lab1a-buoc21.png)
+
+**Đăng nhập:** Sử dụng tài khoản SSO của bạn
+
+![Bước 22](/img/lab1a-buoc22.png)
+
+**Tạo Datacenter:** New datacenter → Đặt tên cho DC
+
+![Bước 23](/img/lab1a-buoc23.png)
+
+**Đặt tên cho Cluster**
+
+![Bước 24](/img/lab1a-buoc24.png)
+
+**Cấu hình Cluster:**
+
+| Tính năng | Trạng thái |
+|-----------|------------|
+| vSphere DRS | Disable |
+| vSphere HA | Disable |
+| vSAN | Disable |
+| Enable vSAN ESA | Uncheck |
+| Manage all hosts in the cluster with a single image | Uncheck |
+| Manage configuration at a cluster level | Uncheck |
+
+→ `Next` → `Finish`
+
+### 5. Thêm ESXi Host vào Cluster
+
+![Bước 25](/img/lab1a-buoc25.png)
+
+**Hướng dẫn:** Cluster → `Configure` → `Quick Start` → `Add Host` → `ADD`
+
+**⚠️ Lưu ý quan trọng:** Hãy chắc chắn bước này bạn có 3 thiết bị ESXi trở lên (nếu bạn chỉ có 1 cái, hãy thiết lập thêm 2 cái ESXi với địa chỉ IP khác - tham khảo phần ### 1. Cài đặt máy ảo ESXi)
+
+![Bước 26](/img/lab1a-buoc26.png)
+
+**Thông tin kết nối:**
+
+| Trường | Giá trị |
+|--------|---------|
+| IP address or FQDN | Nhập IP hoặc tên miền máy chủ (nếu bạn có DNS) |
+| Username | root (mặc định của máy chủ ESXi) |
+| Password | Mật khẩu bạn đặt cho máy chủ ESXi |
+
+→ `Next`
+
+**Xác nhận:** Tích chọn các máy chủ → `OK`
+
+**Hoàn tất:** Host summary → `Next` → `Finish`
+
+### 6. Xác nhận và kiểm tra kết quả
+
+![Bước 27](/img/lab1a-buoc27.png)
+
+**Kiểm tra trạng thái Host:** 
+- Add hosts: Not configured hosts: 3 → Đã thêm thành công
+
+![Bước 28](/img/lab1a-buoc28.png)
+
+**Thoát Maintenance Mode:** Host → Right-click → Maintenance Mode → Exit Maintenance Mode
+
 ## III. Kiểm tra và xác nhận
+
+### Kết quả mong đợi
 
 Sau khi hoàn thành các bước trên, bạn có thể:
 
@@ -187,15 +268,38 @@ Sau khi hoàn thành các bước trên, bạn có thể:
 2. **Đăng nhập:** Sử dụng tài khoản `Administrator@[domain]` và mật khẩu đã thiết lập
 3. **Kiểm tra kết nối:** Xác nhận ESXi host đã được quản lý bởi vCenter
 
+### Cấu trúc Inventory
+
+**Kết quả mong đợi:** Inventory hiển thị cấu trúc: **vCenter > Datacenter > Cluster > ESXi Host**
+
+Bạn có thể kiểm tra bằng cách:
+- Xem resource pools và storage/network liên kết
+- Kiểm tra trạng thái của các ESXi host
+- Xác nhận tất cả host đã thoát khỏi Maintenance Mode
+
+### Xử lý sự cố
+
+Nếu gặp lỗi kết nối, hãy kiểm tra:
+
+1. **Firewall trên ESXi:**
+   ```bash
+   esxcli network firewall ruleset set --ruleset-id=syslog --enabled=true
+   ```
+
+2. **DNS Resolution:** Đảm bảo các host có thể resolve được tên miền của vCenter
+
+3. **Network Connectivity:** Kiểm tra kết nối mạng giữa vCenter và ESXi hosts
+
+### Mục tiêu Lab
+
+Lab này chứng minh vCenter là trung tâm quản lý, cho phép:
+- Giám sát tập trung tất cả ESXi hosts
+- Cấu hình và quản lý cluster
+- Tối ưu hóa tài nguyên và hiệu suất hệ thống
+
 ## IV. Lưu ý quan trọng
 
 - **Bảo mật:** Luôn sử dụng mật khẩu mạnh cho tất cả tài khoản
 - **Backup:** Thực hiện backup cấu hình sau khi thiết lập thành công
 - **Monitoring:** Thiết lập monitoring để theo dõi trạng thái hệ thống
 - **Documentation:** Ghi lại tất cả thông tin cấu hình để tham khảo sau này
-
-
-
-
-
-

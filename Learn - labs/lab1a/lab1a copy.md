@@ -1,144 +1,198 @@
-I. Khởi tạo tài nguyên (VMware)
-1. phan cứng
-![phancung](/img/lab1a-phancung.png)
+# Lab 1A: Cài đặt VMware vSphere
 
-2. mạng
-![mang](/img/lab1a-mang.png)
+## I. Khởi tạo tài nguyên (VMware)
 
-II. Thiết lập
-1. Cài đặt máy ảo 
+### 1. Phần cứng
+![Phần cứng](/img/lab1a-phancung.png)
 
-![buoc1](/img/lab1a-buoc1.png)
+### 2. Mạng
+![Mạng](/img/lab1a-mang.png)
 
-2. Thiết lập mạng trong vm
+## II. Thiết lập
 
-![buoc2](/img/lab1a-buoc2.png)
+### 1. Cài đặt máy ảo ESXi
 
-> Bấm `F2` -> Nhập mật khẩu bạn đã thiết lập khi cài iso
+![Bước 1](/img/lab1a-buoc1.png)
 
-![buoc3](/img/lab1a-buoc3.png)
+### 2. Thiết lập mạng trong VM
 
-> Bấm mũi tên xuống -> `Enter` chọn `Configure Management Network` 
+![Bước 2](/img/lab1a-buoc2.png)
 
-![buoc4](/img/lab1a-buoc4.png)
+**Lưu ý:** Bấm `F2` → Nhập mật khẩu bạn đã thiết lập khi cài ISO
 
-> Bấm mũi tên xuống -> `Enter` chọn `IPv4 Configuration` 
+![Bước 3](/img/lab1a-buoc3.png)
 
-![buoc5](/img/lab1a-buoc5.png)
+**Hướng dẫn:** Bấm mũi tên xuống → `Enter` chọn `Configure Management Network`
 
-> Bấm nút xuống để di chuyển, space để chọn
-> Disable IPv4 configuration for management network: Bạn sẽ tắt không sử dụng IPv4
-> Use dynamic IPv4 address and network configuration: cho phép bạn sử dụng ip được cung cấp từ DHCP của VMware.
-> Set static IPv4 address and network configuration: Lựa chọn này cho phép bạn thiết lập IP tĩnh (trong dự án này tôi sẽ sử dụng ip tĩnh và được thiết lập như sau).
+![Bước 4](/img/lab1a-buoc4.png)
 
-![buoc6](/img/lab1a-buoc6.png)
+**Hướng dẫn:** Bấm mũi tên xuống → `Enter` chọn `IPv4 Configuration`
 
-> Nhập các trường thông tin mạng bạn muốn set
+![Bước 5](/img/lab1a-buoc5.png)
 
-![buoc7](/img/lab1a-buoc7.png)
+**Các tùy chọn IPv4:**
+- **Disable IPv4 configuration for management network:** Tắt không sử dụng IPv4
+- **Use dynamic IPv4 address and network configuration:** Cho phép sử dụng IP được cung cấp từ DHCP của VMware
+- **Set static IPv4 address and network configuration:** Thiết lập IP tĩnh (trong dự án này sẽ sử dụng IP tĩnh)
 
-> Tương tự IPv4 nhưng vì không sử dụng nên thôi sẽ Disable
+![Bước 6](/img/lab1a-buoc6.png)
 
-![buoc8](/img/lab1a-buoc8.png)
+**Hướng dẫn:** Nhập các trường thông tin mạng bạn muốn thiết lập
 
-> Thiết lập DNS cho máy
-> Bạn có thể dụng một máy chủ DNS riêng, sử dụng 10.10.10.1 nếu đang làm trong lab mà không muốn có thêm một vm
-> Đặt hostname để dễ nhận diện máy chủ
+![Bước 7](/img/lab1a-buoc7.png)
 
-> Sau khi thiết lập xong các bước -> bấm `esc` -> bấm phím `Y`
+**Lưu ý:** Tương tự IPv4 nhưng vì không sử dụng nên sẽ Disable
 
-3. Thiết lập vCenter
+![Bước 8](/img/lab1a-buoc8.png)
 
-![buoc9](/img/lab1a-buoc9.png)
+**Thiết lập DNS:**
+- Bạn có thể sử dụng một máy chủ DNS riêng
+- Sử dụng `10.10.10.1` nếu đang làm trong lab mà không muốn có thêm một VM
+- Đặt hostname để dễ nhận diện máy chủ
 
-> Truy cập esxi bằng link được do mình đã cấu hình, ở đây của tôi là `https://h1/` hoặc `https://10.10.10.101`
+**Kết thúc:** Sau khi thiết lập xong các bước → bấm `Esc` → bấm phím `Y`
 
+### 3. Thiết lập vCenter
 
-![buoc10](/img/lab1a-buoc10.png)
+![Bước 9](/img/lab1a-buoc9.png)
 
-> Tên tài khoản mặc định là root
-> Mật khẩu khi bạn thiết lập cài đặt hệ điều hành esxi
+**Truy cập ESXi:** Sử dụng link đã được cấu hình, ví dụ: `https://h1/` hoặc `https://10.10.10.101`
 
-![buoc11](/img/lab1a-buoc11.png)
+![Bước 10](/img/lab1a-buoc10.png)
 
-> Chọn `Virtual Machines` -> `Create / Register VM`
+**Thông tin đăng nhập:**
+- Tên tài khoản mặc định: `root`
+- Mật khẩu: Mật khẩu khi bạn thiết lập cài đặt hệ điều hành ESXi
 
-![buoc12](/img/lab1a-buoc12.png)
+![Bước 11](/img/lab1a-buoc11.png)
 
-> Ở đây tôi chọn tùy chọn cài đặt vCenter từ file OVA, bạn có thể xem thêm thông tin tải về tại đây ....
+**Hướng dẫn:** Chọn `Virtual Machines` → `Create / Register VM`
 
-![buoc13](/img/lab1a-buoc13.png)
-Tải file và tiến hành cài đặt từng mục như sau:
-- Select the OVF and VMDK files: 
-| Enter a name for the virtual machine.  | Điền tên máy vcenter|
+![Bước 12](/img/lab1a-buoc12.png)
+
+**Lưu ý:** Ở đây tôi chọn tùy chọn cài đặt vCenter từ file OVA
+
+![Bước 13](/img/lab1a-buoc13.png)
+
+**Tải file và tiến hành cài đặt từng mục như sau:**
+
+#### Select the OVF and VMDK files:
+| Trường | Giá trị |
+|--------|---------|
+| Enter a name for the virtual machine | Điền tên máy vCenter |
 | Click to select files | Click tải lên file OVA |
-> `Next`
 
-- Select storage
-> `Next`
+→ `Next`
 
-- License agreements
-> `I AGREE` -> `I AGREE`
+#### Select storage
+→ `Next`
 
-- Deployment options
+#### License agreements
+→ `I AGREE` → `I AGREE`
+
+#### Deployment options
+| Trường | Giá trị |
+|--------|---------|
 | Network mappings | VM Network |
 | Deployment type | Tiny vCenter Server with Embedded PSC |
 | Disk provisioning | Thin |
-| Power on automatically | Check |
-> `Next`
+| Power on automatically | ✓ Check |
 
-- Additional settings
-	+ Networking Configuration 
-		| Host Network IP Address Family | IPv4 (hoặc ipv6 nếu bạn sử dụng)| 
-		| Host Network Mode | static (hoặc dhcp nếu bạn muốn cấp ip tự động) |
-		| Host Network IP Address | 10.x.x.x (đây là ip bạn sẽ thiết lập cho trang máy chủ vsphere)|
-		| Host Network Prefix | 24 (subnet mask)|
-		| Host Network Default Gateway | Điền gateway của bạn (mặc định thường là otec 1 trong dải mạng vd: 10.10.10.1)|
-		| Host Network DNS Servers | Điền địa chỉ máy chủ DNS của bạn (chưa có có thể điền ip của chính máy đó) |
-		| Host Network Identity | Domain của vsphere (vd: vcenter.lab.local)|  
-	> `Next`
-	+ SSO Configuration
-		| Directory Password | Mật khẩu của trang quản trị vsphere|
-		|  Directory Password confirm | Nhập lại mật khẩu |
-	> `Next`
-	+ System Configuration
-		| Root Password | Mật khẩu của máy chủ vsphere |
-		|  Root Password confirm | Nhập lại mật khẩu |
-	> `Next`
-	+ Những cái còn lại có thể tạm thời bỏ qua
-	> `Next` -> `Finish`
+→ `Next`
 
-![buoc14](/img/lab1a-buoc14.png)
-> Đợi vài phút cho máy cài đặt và khởi chạy
+#### Additional settings
 
-![buoc15](/img/lab1a-buoc15.png)
-> Truy cập theo đường link đã cấu hình (hoặc với ip của nó đi kèm port, vd: https://10.10.10.10:5480 hoặc https://vcenter.lab.local:5480)
+**Networking Configuration:**
+| Trường | Giá trị |
+|--------|---------|
+| Host Network IP Address Family | IPv4 (hoặc IPv6 nếu bạn sử dụng) |
+| Host Network Mode | Static (hoặc DHCP nếu bạn muốn cấp IP tự động) |
+| Host Network IP Address | 10.x.x.x (IP bạn sẽ thiết lập cho trang máy chủ vSphere) |
+| Host Network Prefix | 24 (subnet mask) |
+| Host Network Default Gateway | Gateway của bạn (mặc định thường là octet 1 trong dải mạng, ví dụ: 10.10.10.1) |
+| Host Network DNS Servers | Địa chỉ máy chủ DNS của bạn (chưa có có thể điền IP của chính máy đó) |
+| Host Network Identity | Domain của vSphere (ví dụ: vcenter.lab.local) |
 
-![buoc16](/img/lab1a-buoc16.png)
-> Nhập mật khaair của máy chủ vsphere
+→ `Next`
 
-![buoc17](/img/lab1a-buoc17.png)
-> Chọn `Setup`
+**SSO Configuration:**
+| Trường | Giá trị |
+|--------|---------|
+| Directory Password | Mật khẩu của trang quản trị vSphere |
+| Directory Password confirm | Nhập lại mật khẩu |
 
-- Setup Wizard
-	+ vCenter Server Configuration
-		| Network configuration | Mặc định |
-		| IP version | Mặc định |
-		| System name | Mặc định |
-		| IP address | Mặc định |
-		| Subnet mask or prefix length | Mặc định |
-		| Default gateway | Mặc định |
-		| DNS servers | Mặc định |
-		| Time synchronization mode | Synchronize time with the ESXi host (hoặc Synchronize time with the NTP servers )
-		| SSH access | Active (Nên để để có thể truy cập tìm lỗi và sửa)|
-	> `Next`
-	+ SSO Configuration (Create a new SSO domain)
-		| Single Sign-On domain name | đặt đồ main cho tài khoản truy cập (vd: Nếu bạn đặt là vsphere.local -> tên tài khoản của bạn sẽ là Administrator@vsphere.local) |
-		| Single Sign-On password |  Mật khẩu của trang quản trị vsphere |
-		| Confirm password | Nhập lại mật khẩu |
-	> `Next`
-	+  Configure CEIP
-	> `Next` -> `Finish`
+→ `Next`
+
+**System Configuration:**
+| Trường | Giá trị |
+|--------|---------|
+| Root Password | Mật khẩu của máy chủ vSphere |
+| Root Password confirm | Nhập lại mật khẩu |
+
+→ `Next`
+
+**Các cài đặt khác:** Có thể tạm thời bỏ qua
+→ `Next` → `Finish`
+
+![Bước 14](/img/lab1a-buoc14.png)
+
+**Lưu ý:** Đợi vài phút cho máy cài đặt và khởi chạy
+
+![Bước 15](/img/lab1a-buoc15.png)
+
+**Truy cập:** Sử dụng đường link đã cấu hình (hoặc với IP của nó đi kèm port, ví dụ: `https://10.10.10.10:5480` hoặc `https://vcenter.lab.local:5480`)
+
+![Bước 16](/img/lab1a-buoc16.png)
+
+**Hướng dẫn:** Nhập mật khẩu của máy chủ vSphere
+
+![Bước 17](/img/lab1a-buoc17.png)
+
+**Hướng dẫn:** Chọn `Setup`
+
+#### Setup Wizard
+
+**vCenter Server Configuration:**
+| Trường | Giá trị |
+|--------|---------|
+| Network configuration | Mặc định |
+| IP version | Mặc định |
+| System name | Mặc định |
+| IP address | Mặc định |
+| Subnet mask or prefix length | Mặc định |
+| Default gateway | Mặc định |
+| DNS servers | Mặc định |
+| Time synchronization mode | Synchronize time with the ESXi host (hoặc Synchronize time with the NTP servers) |
+| SSH access | Active (Nên để để có thể truy cập tìm lỗi và sửa) |
+
+→ `Next`
+
+**SSO Configuration (Create a new SSO domain):**
+| Trường | Giá trị |
+|--------|---------|
+| Single Sign-On domain name | Đặt domain cho tài khoản truy cập (ví dụ: Nếu bạn đặt là vsphere.local → tên tài khoản của bạn sẽ là Administrator@vsphere.local) |
+| Single Sign-On password | Mật khẩu của trang quản trị vSphere |
+| Confirm password | Nhập lại mật khẩu |
+
+→ `Next`
+
+**Configure CEIP:**
+→ `Next` → `Finish`
+
+## III. Kiểm tra và xác nhận
+
+Sau khi hoàn thành các bước trên, bạn có thể:
+
+1. **Truy cập vSphere Client:** Sử dụng địa chỉ `https://[IP-vCenter]/ui`
+2. **Đăng nhập:** Sử dụng tài khoản `Administrator@[domain]` và mật khẩu đã thiết lập
+3. **Kiểm tra kết nối:** Xác nhận ESXi host đã được quản lý bởi vCenter
+
+## IV. Lưu ý quan trọng
+
+- **Bảo mật:** Luôn sử dụng mật khẩu mạnh cho tất cả tài khoản
+- **Backup:** Thực hiện backup cấu hình sau khi thiết lập thành công
+- **Monitoring:** Thiết lập monitoring để theo dõi trạng thái hệ thống
+- **Documentation:** Ghi lại tất cả thông tin cấu hình để tham khảo sau này
 
 
 
