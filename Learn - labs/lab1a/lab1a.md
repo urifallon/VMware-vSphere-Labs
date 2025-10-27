@@ -229,7 +229,7 @@
 
 **Hướng dẫn:** Cluster → `Configure` → `Quick Start` → `Add Host` → `ADD`
 
-**⚠️ Lưu ý quan trọng:** Hãy chắc chắn bước này bạn có 3 thiết bị ESXi trở lên (nếu bạn chỉ có 1 cái, hãy thiết lập thêm 2 cái ESXi với địa chỉ IP khác - tham khảo phần ### 1. Cài đặt máy ảo ESXi)
+**⚠️ Lưu ý quan trọng:** Hãy chắc chắn bước này bạn có 3 thiết bị ESXi trở lên (nếu bạn chỉ có 1 cái, hãy thiết lập thêm 2 cái ESXi với địa chỉ IP khác - tham khảo phần <a href="#1-cài-đặt-máy-ảo-esxi">### 1. Cài đặt máy ảo ESXi</a>)
 
 ![Bước 26](/img/lab1a-buoc26.png)
 
@@ -246,6 +246,8 @@
 **Xác nhận:** Tích chọn các máy chủ → `OK`
 
 **Hoàn tất:** Host summary → `Next` → `Finish`
+
+**⚠️ Xử lý lỗi License:** Nếu gặp lỗi license khi thêm ESXi host, hãy sử dụng các license keys có sẵn tại: https://gist.github.com/urifallon/ecefb8e4a8473174aca3d6adc67fdfe5
 
 ### 6. Xác nhận và kiểm tra kết quả
 
