@@ -68,7 +68,11 @@
 
 **Các bước thực hiện:**
 1. Tạo `vDS-Cluster` (Distributed Switch): vCenter → Networking → Datacenter → Right-Click → Distributed Switch → New Distributed Switch → Name: `vDS-Cluster` → Chọn version của bạn → Next → Uncheck `Create a default port group` → Finish.
+
 2. Tạo `DPG-MGMT` (Distributed Port Group): vCenter → Networking → Datacenter → `vDS-Cluster` → Right-Click → Distributed Port Group → New Distributed Port Group → Name: `DPG-MGMT` → Next → Check `Customize default policies configuration` → Next → Next → Next → (Nếu có) chuyển `Uplink2, Uplink3, Uplink4` xuống `Unused uplinks` → Next → Next → Next → Finish.
+
 3. Gắn `vDS-Cluster` vào ESXi (Add and Manage Hosts): vCenter → Networking → Datacenter → `vDS-Cluster` → Right-Click → Add and Manage Hosts → Add hosts → chọn host cần chuyển qua `DPG-MGMT` → Next → tại cột `Assign Uplink` của `vmnic1`, chọn `Uplink1` (trùng với uplink đang Active của `DPG-MGMT`) → Next các bước còn lại (không đổi cấu hình) → Finish.
+
 4. Chuyển mạng của vCenter từ `VM Network` → `DPG-MGMT`: vCenter → VMs and Templates → Datacenter → chọn VM vCenter (vị trí mặc định: `Discovered virtual machine`) → Right-Click → Edit Settings → `Network Adapter 1` → Browse → chọn `DPG-MGMT` → OK → OK.
+
 5. Chuyển mạng của ESXi từ `VM Network` → `DPG-MGMT`: vCenter → Networking → Datacenter → `vDS-Cluster` → Right-Click → Add and Manage Hosts → Add hosts → chọn host cần chuyển qua `DPG-MGMT` → thực hiện migrate như hướng dẫn.
