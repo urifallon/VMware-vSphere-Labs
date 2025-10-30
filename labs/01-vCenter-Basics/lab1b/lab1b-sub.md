@@ -53,17 +53,22 @@
 > Di chuyển chỉ vmk0 (Management IP) từ vSwitch0 (vSS) sang vDS-Cluster → DPG_10.10.10.0_prefix24, dùng cùng subnet 10.10.10.0/24.
 > (giữ nguyên IP/Netmask/Gateway, không đổi VLAN nếu lab không có trunk).
 
-1. Chuẩn bị mạng của VM như sau 
-![buoc1](./img/lab1b-sub-buoc1.png)
+### 1. Chuẩn bị mạng dự phòng
 
-ESXI cần 2 nic (Adapter) khác nhau nhưng cùng 1 dải mạng để có thể dự phòng khi chuyển đổi từ vSs sang vDs
+![Bước 1](./img/lab1b-sub-buoc1.png)
 
-- Khi chuyển đổi không có mạng dự phòng:
-hình ảnh
-    - Khi chuyển đưa vcenter từ vSs sang dùng mạng vDs sẽ trực tiếp bị ngắt
-    - Từ đó cũng không không thể migrate Esxi sang sử dụng vDs được 
+**Yêu cầu:** ESXi cần 2 NIC (network adapter) khác nhau nhưng cùng một dải mạng để có đường dự phòng khi chuyển đổi từ vSS sang vDS.
 
-- Khi chuyển đổi có mạng dự phòng:
-hình ảnh
-    - Khi này sử dụng vDs ta sẽ có nic1 được gắn vào uplink1, uplink1 được gắn vào PG-MGMT => ta có một đường y hệt đường từ nic0 đến VM Network
-    - 
+#### Trường hợp không có mạng dự phòng
+- Khi chuyển vCenter từ vSS sang dùng mạng vDS, kết nối có thể bị ngắt ngay lập tức.
+- Hệ quả: Không thể tiếp tục migrate ESXi sang sử dụng vDS.
+
+#### Trường hợp có mạng dự phòng
+- Với vDS: `vmnic1` gắn vào `Uplink1`, `Uplink1` gắn vào `DPG-MGMT` → hình thành tuyến tương đương với tuyến từ `vmnic0` đến `VM Network` (đường dự phòng an toàn khi chuyển đổi).
+
+**Các bước thực hiện:**
+1. Tạo `vDS-Cluster` (Distributed Switch): vCenter → Networking → Datacenter → Right-Click → Distributed Switch → New Distributed Switch → Name: `vDS-Cluster` → Chọn version của bạn → Next → Uncheck `Create a default port group` → Finish.
+2. Tạo `DPG-MGMT` (Distributed Port Group): vCenter → Networking → Datacenter → `vDS-Cluster` → Right-Click → Distributed Port Group → New Distributed Port Group → Name: `DPG-MGMT` → Next → Check `Customize default policies configuration` → Next → Next → Next → (Nếu có) chuyển `Uplink2, Uplink3, Uplink4` xuống `Unused uplinks` → Next → Next → Next → Finish.
+3. Gắn `vDS-Cluster` vào ESXi (Add and Manage Hosts): vCenter → Networking → Datacenter → `vDS-Cluster` → Right-Click → Add and Manage Hosts → Add hosts → chọn host cần chuyển qua `DPG-MGMT` → Next → tại cột `Assign Uplink` của `vmnic1`, chọn `Uplink1` (trùng với uplink đang Active của `DPG-MGMT`) → Next các bước còn lại (không đổi cấu hình) → Finish.
+4. Chuyển mạng của vCenter từ `VM Network` → `DPG-MGMT`: vCenter → VMs and Templates → Datacenter → chọn VM vCenter (vị trí mặc định: `Discovered virtual machine`) → Right-Click → Edit Settings → `Network Adapter 1` → Browse → chọn `DPG-MGMT` → OK → OK.
+5. Chuyển mạng của ESXi từ `VM Network` → `DPG-MGMT`: vCenter → Networking → Datacenter → `vDS-Cluster` → Right-Click → Add and Manage Hosts → Add hosts → chọn host cần chuyển qua `DPG-MGMT` → thực hiện migrate như hướng dẫn.
