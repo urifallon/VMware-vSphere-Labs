@@ -170,4 +170,58 @@ Cấu hình pfsense:
 Tại sao phải cài một máy cấu hình? -> hiện tại ta đang làm trong lab sử dụng vmw -> esxi nằm trong vmw -> vm nằm trong esxi -> host không thể với tới để cấu hình bằng gui cho pfsense được -> cài đặt một máy ubuntu cùng dải mạng GW để có thể cấu hình cho pfsense
 - truy cập domain 10.10.1.1 từ trình duyệt trong vm utest 
 - tài khoản: admin
-- mật khẩu : 
+- mật khẩu : pfsense
+
+-> bước 3: cấu hình pfsense
+- Next -> next 
+
+-> bước 4 cấu hình Assign Interfaces trong pfsense console (1) -> Enter
+
+- Should VLANs be set up now [y|n]? => n
+- Enter WAN interface name: vmx1
+- Enter LAN interface name: vmx0
+- Enter Optional interface name:
+
+| Interface | Nhập           | Mạng dự kiến             |
+| --------- | -------------- | ------------------------ |
+| OPT1      | vmx2           | WebProxy – 10.10.20.0/24 |
+| OPT2      | vmx3           | App – 10.10.12.0/24      |
+| OPT3      | vmx4           | DB – 10.10.80.0/24       |
+
+- Do you want to proceed? [y|n] => y
+
+![pfsense](./img/openemr-pfsense-3.png)
+
+-> bước 5 cấu hình Set Interface(s) IP address (2) -> Enter
+- LAN:
+Enter the number of the interface to configure: 2
+IP address: 10.10.1.1
+Subnet bits: 24
+Gateway: bỏ trống
+Configure IPv6? → n
+Enable DHCP server? → n
+Revert webConfigurator to HTTP? → n
+
+- OPT1 (WEB)
+Enter the number of the interface to configure: 3
+IP address: 10.10.20.1
+Subnet bits: 24
+Gateway: bỏ trống
+IPv6: n
+DHCP: n
+
+- OPT2 (App)
+Enter the number of the interface to configure: 4
+IP: 10.10.12.1
+Subnet bits: 24
+Gateway: (để trống)
+IPv6: n
+DHCP: n
+
+- OPT3 (DB)
+Enter the number of the interface to configure: 5
+IP: 10.10.80.1
+Subnet bits: 24
+Gateway: (để trống)
+IPv6: n
+DHCP: n
