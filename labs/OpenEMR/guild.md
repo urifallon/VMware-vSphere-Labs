@@ -633,3 +633,61 @@ sudo mv /var/www/html/openemr-7.0.2 /var/www/html/openemr
 sudo chown -R www-data:www-data /var/www/html/openemr
 sudo chmod -R 755 /var/www/html/openemr
 ```
+
+5️⃣ Cấu hình Nginx (Local App Server)
+Tạo Virtual Host để xử lý request từ WebProxy chuyển vào.
+
+```bash
+sudo nano /etc/nginx/sites-available/openemr
+```
+
+```bash
+server {
+    listen 80;
+    server_name _; # Chấp nhận mọi connection nội bộ
+
+    root /var/www/html/openemr;
+    index index.php;
+
+    access_log /var/log/nginx/openemr_access.log;
+    error_log /var/log/nginx/openemr_error.log;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # Chặn truy cập trực tiếp vào các thư mục nhạy cảm
+    location ~ /(config|sql|documents|edithistory)/ {
+        deny all;
+    }
+
+    # Xử lý PHP qua FPM
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+        fastcgi_read_timeout 300; # Tăng timeout cho các xử lý lâu
+    }
+
+    # Tăng giới hạn upload cho Nginx
+    client_max_body_size 128M;
+}
+```
+
+Kích hoạt và reload Nginx:
+```bash
+sudo ln -s /etc/nginx/sites-available/openemr /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default  # Xóa cấu hình mặc định nếu muốn
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+✅ Kiểm tra nhanh
+
+Tại thời điểm này, từ máy WebProxy (10.10.20.10), bạn có thể thử kết nối vào App:
+
+```bash
+# Chạy lệnh này TRÊN MÁY WEBPROXY
+curl -I http://10.10.12.10/index.php
+```
