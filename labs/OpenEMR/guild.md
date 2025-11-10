@@ -731,3 +731,84 @@ Tại thời điểm này, từ máy WebProxy (10.10.20.200), bạn có thể th
 # Chạy lệnh này TRÊN MÁY WEBPROXY
 curl -I http://10.10.12.200/index.php
 ```
+
+**XII. Triển khai máy chủ Database (10.10.80.10)**
+
+1️⃣ Cấu hình Mạng (IP tĩnh):
+
+```bash
+sudo nano /etc/netplan/00-installer-config.yaml
+```
+
+```bash
+network:
+  ethernets:
+    ens160: # ⚠️ Thay bằng tên card mạng thực tế của bạn (dùng `ip a` để xem)
+      dhcp4: false
+      addresses:
+        - 10.10.80.200/24
+      routes:
+        - to: default
+          via: 10.10.80.200
+      nameservers:
+        addresses:
+          - 8.8.8.8
+          - 1.1.1.1
+  version: 2
+```
+
+2️⃣ Cài đặt MariaDB Server
+
+```bash
+sudo apt update
+sudo apt install -y mariadb-server
+sudo systemctl enable mariadb
+sudo systemctl start mariadb
+``` 
+
+3️⃣ Cấu hình Bảo mật & Mở kết nối từ xa
+```bash
+sudo mysql_secure_installation
+```
+
+Cho phép máy APP kết nối vào:
+```bash
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+```
+
+Tìm dòng bind-address = 127.0.0.1 và sửa thành:
+```
+bind-address = 0.0.0.0
+```
+
+Lưu file và restart dịch vụ:
+
+```bash
+sudo systemctl restart mariadb
+```
+
+4️⃣ Tạo Database và User cho OpenEMR
+
+Đăng nhập vào MariaDB bằng tài khoản root vừa tạo:
+```bash
+sudo mariadb -u root -p
+```
+
+(Nhập mật khẩu DBRootSuperSecret1!)
+
+Chạy các lệnh SQL sau để tạo database openemr và user openemr:
+
+```bash 
+CREATE DATABASE openemr CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE USER 'openemr'@'%' IDENTIFIED BY 'OpenEMRUserPass123!';
+GRANT ALL PRIVILEGES ON openemr.* TO 'openemr'@'%';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+⚠️ Lưu ý: Ghi nhớ mật khẩu OpenEMRUserPass123! (hoặc mật khẩu bạn tự đặt) để dùng ở bước cài đặt trên web sau này.
+
+✅ Kiểm tra kết nối liên server (Quan trọng)
+```bash
+mariadb -u openemr -p -h 10.10.80.10
+```
