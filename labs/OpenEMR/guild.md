@@ -510,6 +510,11 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_connect_timeout 1200;
+        proxy_send_timeout 1200;
+        proxy_read_timeout 1200;
+        send_timeout 1200;
     }
 }
 ```
@@ -812,3 +817,36 @@ EXIT;
 ```bash
 mariadb -u openemr -p -h 10.10.80.10
 ```
+
+## **XII. Cấu hình kế nối hoàn thiện**
+
+Truy cập domain đã cấu hình http://fatbeo.com
+
+### **Phần 1: MySQL Server Details**
+
+| Trường | Giá trị cần điền | Ghi chú quan trọng |
+| :--- | :--- | :--- |
+| **Server Host** | **`10.10.80.10`** | ⚠️ Phải sửa `localhost` thành IP của máy DB. |
+| **Server Port** | `3306` | Giữ nguyên. |
+| **Database Name** | `openemr` | Giữ nguyên (nếu bạn đã tạo DB tên này). |
+| **Login Name** | `openemr` | Giữ nguyên (nếu user DB là openemr). |
+| **Password** | `(Mật khẩu DB)` | Nhập mật khẩu bạn đã đặt cho user `openemr` trên MariaDB. |
+
+---
+
+### **Phần 2: OpenEMR Initial User Details**
+
+Đây là tài khoản để bạn đăng nhập vào web sau này.
+
+* **Initial User Login Name:** Đặt tên đăng nhập bạn muốn (ví dụ: `admin`).
+* **Initial User Password:** Đặt mật khẩu cho tài khoản admin này.
+
+Sau khi điền xong, nhấn nút **Create DB and User** (hoặc Continue) ở dưới cùng để bắt đầu cài đặt.
+
+![openemr-setup](./img/openemr-pfsense-x.png)
+
+DROP DATABASE openemr;
+CREATE DATABASE openemr CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+GRANT ALL PRIVILEGES ON openemr.* TO 'openemr'@'%';
+FLUSH PRIVILEGES;
+EXIT;
