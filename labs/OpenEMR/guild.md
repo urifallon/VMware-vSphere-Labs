@@ -644,34 +644,74 @@ sudo nano /etc/nginx/sites-available/openemr
 ```bash
 server {
     listen 80;
-    server_name _; # Chấp nhận mọi connection nội bộ
+    server_name _; # Chấp nhận mọi kết nối nội bộ từ WebProxy
 
-    root /var/www/html/openemr;
-    index index.php;
-
+    # Log files
     access_log /var/log/nginx/openemr_access.log;
     error_log /var/log/nginx/openemr_error.log;
 
+    # Đường dẫn gốc tới mã nguồn OpenEMR trong Lab của bạn
+    root /var/www/html/openemr;
+
+    index index.php;
+
+    # Tăng giới hạn upload (quan trọng cho OpenEMR)
+    client_max_body_size 128M;
+
     location / {
+        # Thêm ?$query_string để xử lý tốt các tham số trên URL
         try_files $uri $uri/ /index.php?$query_string;
     }
 
-    # Chặn truy cập trực tiếp vào các thư mục nhạy cảm
-    location ~ /(config|sql|documents|edithistory)/ {
+    # Xử lý PHP scripts
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_index index.php;
+        # ⚠️ Đã cập nhật thành PHP 8.3 cho Lab của bạn
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT $realpath_root;
+        include fastcgi_params;
+        # Tăng thời gian chờ để tránh lỗi 504 khi xử lý tác vụ nặng
+        fastcgi_read_timeout 300;
+    }
+
+    # --- CÁC BẢO MẬT TỪ FILE MẪU ---
+
+    # Chặn truy cập trực tiếp vào các thư mục chứa dữ liệu nhạy cảm
+    location ~* ^/sites/*/(documents|edi|era) {
+        deny all;
+        return 404;
+    }
+
+    # Chặn các thư mục không cần thiết cho người dùng cuối
+    location ~* ^/(contrib|tests) {
+        deny all;
+        return 404;
+    }
+
+    # Chặn truy cập các file cài đặt/nâng cấp sau khi đã deploy xong
+    # (Lưu ý: Nếu cần chạy lại setup.php thì tạm thời comment đoạn này lại)
+    # location ~* ^/(admin|setup|acl_setup|acl_upgrade|sl_convert|sql_upgrade|gacl/setup|ippf_upgrade|sql_patch)\.php {
+    #     deny all;
+    #     return 404;
+    # }
+
+    # Ẩn file ẩn (bắt đầu bằng dấu chấm)
+    location ~ /\. {
         deny all;
     }
 
-    # Xử lý PHP qua FPM
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        include fastcgi_params;
-        fastcgi_read_timeout 300; # Tăng timeout cho các xử lý lâu
+    # Tắt log cho các file thường gặp để đỡ rác log
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
     }
 
-    # Tăng giới hạn upload cho Nginx
-    client_max_body_size 128M;
+    location = /robots.txt {
+        log_not_found off;
+        access_log off;
+    }
 }
 ```
 
