@@ -845,8 +845,10 @@ Sau khi điền xong, nhấn nút **Create DB and User** (hoặc Continue) ở d
 
 ![openemr-setup](./img/openemr-pfsense-x.png)
 
-DROP DATABASE openemr;
+DROP DATABASE IF EXISTS openemr;
+DROP USER IF EXISTS 'openemr'@'%';
 CREATE DATABASE openemr CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE USER 'openemr'@'%' IDENTIFIED BY 'OpenEMRUserPass123!';
 GRANT ALL PRIVILEGES ON openemr.* TO 'openemr'@'%';
 FLUSH PRIVILEGES;
 EXIT;
