@@ -725,9 +725,9 @@ sudo systemctl reload nginx
 
 ✅ Kiểm tra nhanh
 
-Tại thời điểm này, từ máy WebProxy (10.10.20.10), bạn có thể thử kết nối vào App:
+Tại thời điểm này, từ máy WebProxy (10.10.20.200), bạn có thể thử kết nối vào App:
 
 ```bash
 # Chạy lệnh này TRÊN MÁY WEBPROXY
-curl -I http://10.10.12.10/index.php
+curl -I http://10.10.12.200/index.php
 ```
