@@ -158,7 +158,7 @@ Các labs được chia theo “nhóm năng lực” để bạn đi từ nền 
    ```bash
    git clone https://github.com/urifallon/VMware-vSphere-Labs.git
    cd VMware-vSphere-Labs
-````
+   ```
 
 2. **Đọc tài liệu nền tảng** trong `docs/` (yêu cầu lab, network/storage plan).
 3. **Làm labs theo thứ tự** từ Phần 1 → Phần 6 trong `labs/`.
