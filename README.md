@@ -1,161 +1,197 @@
 
-# 📘 Hướng dẫn Lab về Khả năng Mở rộng của vSphere
+# VMware vSphere Labs — Scalability, Performance & Hardening (VI)
 
-Chào mừng bạn đến với Hướng dẫn Lab về Khả năng Mở rộng của vSphere\! Đây là một bộ sưu tập các bài thực hành (hands-on labs) được thiết kế để giúp bạn xây dựng, quản lý và tối ưu hóa một môi trường VMware vSphere từ cơ bản đến nâng cao.
+Bộ tài liệu **hands-on labs** giúp bạn **xây dựng, vận hành và mở rộng** môi trường **VMware vSphere** theo cách có hệ thống: từ nền tảng (ESXi/vCenter/Cluster) đến **networking (vSS/vDS/LACP/NIOC)**, **storage (VMFS/NFS/iSCSI/vSAN/SPBM)**, **HA/DRS/vMotion**, tối ưu hiệu năng và **hardening bảo mật**.
 
-Kho lưu trữ này tập trung vào các kịch bản thực tế, giúp bạn hiểu rõ về kiến trúc, hiệu suất, tính sẵn sàng cao và khả năng mở rộng của nền tảng ảo hóa hàng đầu thế giới.
+> Mục tiêu của repo: biến kiến thức vSphere từ “biết dùng UI” thành “thiết kế + vận hành + troubleshoot theo tư duy production”.
 
-## 🎯 Đối tượng hướng tới
+---
 
-Kho lưu trữ này lý tưởng cho:
+## Nội dung chính
 
-  * **Quản trị viên Hệ thống (SysAdmins)** muốn nâng cao kỹ năng vSphere.
-  * **Kỹ sư Giải pháp (Solution Architects)** cần thiết kế các môi trường có khả năng mở rộng.
-  * **Sinh viên và Người mới bắt đầu** muốn có kinh nghiệm thực tế về ảo hóa.
+- **Thiết kế lab vSphere chuẩn thực tế** (nested hoặc vật lý) và baseline vận hành
+- **Khả năng mở rộng & tính sẵn sàng cao**: Cluster/HA/DRS/vMotion/Storage vMotion
+- **Networking**: vSS vs vDS, VLAN, uplink design, LACP, NIOC, Port Mirroring/QoS
+- **Storage**: VMFS/NFS/iSCSI, Storage Policy (SPBM), Storage DRS, vSAN (HCI)
+- **Performance & Troubleshooting**: đọc chỉ số, nhận diện bottleneck (CPU/RAM/NET/DISK), `esxtop`
+- **Security**: RBAC, chứng chỉ, encryption, lockdown mode, hardening & audit mindset
 
------
+---
 
-## 🏛️ Sơ đồ Kiến trúc vSphere
+## Đối tượng phù hợp
 
-Để hiểu rõ các thành phần cốt lõi và cách chúng tương tác với nhau, bạn có thể xem sơ đồ kiến trúc tổng quan dưới đây.
+- SysAdmin/Infra Engineer muốn đi sâu vSphere theo hướng vận hành bài bản
+- DevOps/SRE cần nền tảng ảo hóa vững để triển khai workload ổn định
+- Sinh viên/người tự học muốn có “lab path” rõ ràng để luyện kỹ năng
 
-\<details\>
-\<summary\>Nhấn vào đây để xem Sơ đồ Kiến trúc các Lớp (Layers)\</summary\>
+---
+
+## Cấu trúc repo (khuyến nghị cách đọc)
+
+- `docs/` — tài liệu nền tảng (khái niệm, yêu cầu lab, best practices)
+- `labs/` — hướng dẫn thực hành theo từng lab (step-by-step)
+- `img/` — sơ đồ, hình minh hoạ
+
+> Cách học tối ưu: **đọc `docs/` trước** → làm labs theo thứ tự → ghi lại “notes + kết quả + lỗi gặp” để hình thành kỹ năng vận hành.
+
+---
+
+## Kiến trúc tổng quan (high level)
+
+<details>
+<summary>Nhấn để xem sơ đồ kiến trúc vSphere (Layers)</summary>
 
 ```
-┌────────────────────────────────────────────────────────────────────────────┐
-│                           [ MANAGEMENT LAYER ]                             │
-│────────────────────────────────────────────────────────────────────────────│
-│  vCenter Server                                                            │
-│     ├─ Quản lý tập trung tất cả các ESXi Hosts                             │
-│     ├─ Tạo / Giám sát Cluster                                              │
-│     ├─ Cấu hình tài nguyên (DRS, HA, vSAN, vDS, vMotion, ...)              │
-│     └─ Cung cấp API, PowerCLI, SSO, Role-Based Access Control              │
-└────────────────────────────────────────────────────────────────────────────┘
-                     │
-                     ▼
-┌────────────────────────────────────────────────────────────────────────────┐
-│                              [ CLUSTER LEVEL ]                             │
-│────────────────────────────────────────────────────────────────────────────│
-│  Cluster (ESXi1, ESXi2, ..., ESXin)                                        │
-│     ├─ Tổng hợp tài nguyên vật lý (CPU, RAM, Disk, NIC)                    │
-│     ├─ Cho phép tính năng DRS (Dynamic Resource Scheduler)                 │
-│     ├─ Cho phép HA (High Availability)                                     │
-│     ├─ Cho phép vMotion / Storage vMotion                                  │
-│     └─ Kết nối đến Datastore, vSAN, và Virtual Networks                    │
-└────────────────────────────────────────────────────────────────────────────┘
-                     │
-                     ▼
-┌────────────────────────────────────────────────────────────────────────────┐
-│                             [ COMPUTE LAYER ]                              │
-│────────────────────────────────────────────────────────────────────────────│
-│  Virtual Machines (VMs)                                                    │
-│     ├─ Sử dụng CPU & RAM được phân bổ từ ESXi                              │
-│     ├─ Hỗ trợ snapshot, clone, template                                    │
-│     ├─ Chạy OS (Linux, Windows, Appliance, vCSA, vROps, vCenter ...)       │
-│     └─ DRS tự động cân bằng tải CPU/RAM giữa các host                      │
-└────────────────────────────────────────────────────────────────────────────┘
-                     │
-                     ▼
-┌────────────────────────────────────────────────────────────────────────────┐
-│                             [ NETWORK LAYER ]                              │
-│────────────────────────────────────────────────────────────────────────────│
-│  vSphere Distributed Switch (vDS)                                          │
-│     ├─ Distributed Port Groups (App, DB, Mgmt, vMotion...)                 │
-│     ├─ VLAN Tagging (VLAN 10, 20, 30...)                                   │
-│     ├─ Uplink Groups (NIC0..NICn) kết nối vật lý tới Switch thật           │
-│     ├─ Load Balancing / Failover                                           │
-│     └─ Hỗ trợ Network I/O Control, vMotion traffic, Management traffic     │
-└────────────────────────────────────────────────────────────────────────────┘
-                     │
-                     ▼
-┌────────────────────────────────────────────────────────────────────────────┐
-│                             [ STORAGE LAYER ]                              │
-│────────────────────────────────────────────────────────────────────────────│
-│  vSAN / Datastore / iSCSI / NFS                                            │
-│     ├─ vSAN: chia sẻ dung lượng local disk của các host                    │
-│     ├─ Datastore: nơi lưu file VM (.vmdk, .vmx, snapshot, ISO)             │
-│     ├─ iSCSI / NFS: lưu trữ mạng ngoài (NAS / SAN)                         │
-Setting, performance │
-└────────────────────────────────────────────────────────────────────────────┘
-                     │
-                     ▼
-┌────────────────────────────────────────────────────────────────────────────┐
-│                    [ SECURITY & AUTOMATION LAYER ]                         │
-│────────────────────────────────────────────────────────────────────────────│
-│  - SSO (Single Sign-On)                                                    │
-│  - Role-Based Access Control (RBAC)                                        │
-│  - Certificates, Trust, Audit Logs                                         │
-│  - PowerCLI / API / vRealize Automation                                    │
-│  - Backup & Restore (vSphere Replication, Veeam, ...)                      │
-└────────────────────────────────────────────────────────────────────────────┘
-```
 
-\</details\>
+┌───────────────────────────────────────────────────────────────────────────┐
+│                           [ MANAGEMENT LAYER ]                              │
+│  vCenter Server                                                             │
+│   ├─ Quản lý tập trung ESXi Hosts / Datacenter / Cluster                    │
+│   ├─ DRS, HA, vMotion, vSAN, vDS, Templates/Content Library                 │
+│   └─ API/Automation: PowerCLI / REST API / RBAC / SSO                       │
+└───────────────────────────────────────────────────────────────────────────┘
+│
+▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│                            [ CLUSTER SERVICES ]                             │
+│  Cluster                                                                     │
+│   ├─ Tổng hợp tài nguyên (CPU/RAM/Storage/Network)                          │
+│   ├─ HA (High Availability) / DRS (Load balancing)                          │
+│   ├─ vMotion / Storage vMotion                                              │
+│   └─ Policy & Compliance (Host Profiles, SPBM, etc.)                        │
+└───────────────────────────────────────────────────────────────────────────┘
+│
+▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│                             [ ESXi / COMPUTE ]                              │
+│  ESXi Hosts                                                                  │
+│   ├─ VMkernel networks (Mgmt / vMotion / vSAN / iSCSI/NFS)                  │
+│   └─ Workloads: Virtual Machines / Appliances                               │
+└───────────────────────────────────────────────────────────────────────────┘
+│
+┌────────┴─────────┐
+▼                  ▼
+┌───────────────────┐  ┌───────────────────────────────────────────────────┐
+│ [ NETWORK LAYER ] │  │                  [ STORAGE LAYER ]                 │
+│ vSS / vDS         │  │ VMFS / NFS / iSCSI / vSAN                          │
+│ VLAN/LACP/NIOC    │  │ SPBM / Storage DRS / Datastore design              │
+└───────────────────┘  └───────────────────────────────────────────────────┘
 
------
+┌───────────────────────────────────────────────────────────────────────────┐
+│                  [ SECURITY & AUTOMATION (CROSS-CUTTING) ]                 │
+│  RBAC/SSO/Certificates/Audit • Encryption • Lockdown/Hardening • API/CLI   │
+└───────────────────────────────────────────────────────────────────────────┘
 
-## 🗺️ Lộ trình Học tập (Mục lục Labs)
+````
+</details>
 
-Các bài lab được chia thành 6 phần chính, đi từ thiết lập cơ bản đến tối ưu hóa và bảo mật nâng cao.
+---
 
-### 🧠 PHẦN 1 – Giới thiệu & Thiết lập Môi trường
+## Yêu cầu lab (gợi ý tối thiểu)
 
+Bạn có thể chạy theo 2 hướng:
+
+### A. Nested Lab (phổ biến cho self-study)
+- 1 máy workstation/PC mạnh (khuyến nghị **>= 32GB RAM**, càng nhiều càng tốt)
+- 2–3 ESXi (nested) + 1 vCenter (VCSA)
+- Network plan: ít nhất các mạng **Mgmt / vMotion / Storage(vSAN hoặc iSCSI/NFS)**
+
+### B. Lab vật lý (gần production hơn)
+- 2–3 ESXi host vật lý + 1 vCenter
+- Storage: vSAN hoặc NAS/SAN (NFS/iSCSI)
+
+> Lưu ý license: vSphere/vCenter thường cần license hoặc trial. Repo này chỉ phục vụ học tập.
+
+---
+
+## Lộ trình Labs (Study Path)
+
+Các labs được chia theo “nhóm năng lực” để bạn đi từ nền tảng → mở rộng → tối ưu → bảo mật.
+
+### Phần 1 — Nền tảng & Thiết lập môi trường
 | Lab | Chủ đề | Mục tiêu |
-| :--- | :--- | :--- |
-| **Lab 1A** | Môi trường vSphere Cốt lõi | Nắm vững các thành phần ESXi, vCenter, Datacenter, và Cluster. |
-| **Lab 1B** | Kiểm thử Cluster (HA/DRS) | Mô phỏng lỗi (fault tolerance) và cân bằng tải (load balancing) cơ bản. |
-| **Lab 1C** | Mô phỏng Đa địa điểm (Multi-site) | Hiểu cách vCenter quản lý các cluster phân tán địa lý và phân đoạn mạng. |
+|---:|---|---|
+| 1A | vSphere Core (ESXi/vCenter/Datacenter/Cluster) | Nắm cấu trúc và luồng quản trị |
+| 1B | Cluster Baseline (HA/DRS) | Hiểu cơ chế HA/DRS và kiểm thử cơ bản |
+| 1C | Multi-site (mô phỏng) | Làm quen tư duy phân đoạn & vận hành đa cụm |
 
-### 🌐 PHẦN 2 – Khả năng Mở rộng Mạng (Network)
-
+### Phần 2 — Networking (Scalability)
 | Lab | Chủ đề | Mục tiêu |
-| :--- | :--- | :--- |
-| **Lab 2A** | vDS vs. vSS | Phân biệt và hiểu lợi ích của Distributed Switch (vDS) so với Standard Switch (vSS). |
-| **Lab 2B** | LACP & NIOC | Cấu hình gộp link (LACP) và kiểm soát I/O mạng (NIOC) để tối ưu băng thông. |
-| **Lab 2C** | Port Mirroring & QoS | Giám sát (security) và ưu tiên (performance) lưu lượng mạng. |
+|---:|---|---|
+| 2A | vSS vs vDS | Nắm khác biệt, use-cases, ưu/nhược |
+| 2B | LACP & NIOC | Thiết kế uplink + kiểm soát băng thông |
+| 2C | Port Mirroring & QoS | Giám sát và ưu tiên lưu lượng |
 
-### 💾 PHẦN 3 – Khả năng Mở rộng Lưu trữ (Storage)
-
+### Phần 3 — Storage (Scalability)
 | Lab | Chủ đề | Mục tiêu |
-| :--- | :--- | :--- |
-| **Lab 3A** | VMFS & NFS | So sánh và triển khai các loại datastore phổ biến (block-level vs. file-level). |
-| **Lab 3B** | Storage Policy & DRS | Tự động hóa cân bằng tải I/O và dung lượng lưu trữ dựa trên chính sách. |
-| **Lab 3C** | vSAN Cluster | Triển khai lưu trữ siêu hội tụ (HCI) với vSAN để đạt được khả năng mở rộng và dự phòng. |
+|---:|---|---|
+| 3A | VMFS & NFS | Triển khai datastore và so sánh block vs file |
+| 3B | Storage Policy & Storage DRS | Tự động hóa theo policy và cân bằng tải |
+| 3C | vSAN Cluster | HCI, fault domain, policy, operational checks |
 
-### 🧑‍💻 PHẦN 4 – Quản lý & Triển khai Host
-
+### Phần 4 — Host Lifecycle & Deployment
 | Lab | Chủ đề | Mục tiêu |
-| :--- | :--- | :--- |
-| **Lab 4A** | Content Library | Quản lý tập trung các ISO, template và script để triển khai VM nhất quán. |
-| **Lab 4B** | Host Profile | Đảm bảo tính tuân thủ (compliance) và đồng nhất cấu hình trên nhiều ESXi host. |
-| **Lab 4C** | Auto Deploy | Triển khai hàng loạt ESXi host tự động qua mạng (PXE) cho môi trường stateless. |
+|---:|---|---|
+| 4A | Content Library | Chuẩn hóa ISO/template/OVF để triển khai nhất quán |
+| 4B | Host Profiles | Compliance, drift detection, đồng nhất cấu hình |
+| 4C | Auto Deploy (overview) | Khái niệm stateless/provisioning ở quy mô lớn |
 
-### ⚡ PHẦN 5 – Tối ưu hóa Hiệu suất
-
+### Phần 5 — Performance & Troubleshooting
 | Lab | Chủ đề | Mục tiêu |
-| :--- | :--- | :--- |
-| **Lab 5A** | CPU/Memory Scheduler | Hiểu các chỉ số `esxtop` quan trọng như %RDY và Ballooning khi có tranh chấp tài nguyên. |
-| **Lab 5B** | Giám sát với `esxtop` | Sử dụng `esxtop` để xác định các điểm nghẽn (bottlenecks) về CPU, RAM, Mạng, và Đĩa. |
-| **Lab 5C** | Tinh chỉnh DRS | Tối ưu hóa các cài đặt của DRS (ví dụ: Aggression Level) để cân bằng tải hiệu quả. |
+|---:|---|---|
+| 5A | CPU/Memory scheduling | Hiểu %RDY, contention, ballooning, swapping |
+| 5B | `esxtop` thực chiến | Khoanh vùng bottleneck CPU/RAM/NET/DISK |
+| 5C | Tuning DRS | Điều chỉnh để cân bằng tải “đúng mục tiêu” |
 
-### 🔒 PHẦN 6 – Bảo mật vSphere
-
+### Phần 6 — Security & Hardening
 | Lab | Chủ đề | Mục tiêu |
-| :--- | :--- | :--- |
-| **Lab 6A** | Users & Roles (RBAC) | Triển khai Phân quyền Dựa trên Vai trò (RBAC) để giới hạn quyền truy cập. |
-| **Lab 6B** | Certificate & Encryption | Thay thế chứng chỉ (VMCA) và mã hóa máy ảo (VM Encryption) để bảo vệ dữ liệu. |
-| **Lab 6C** | Tuân thủ Bảo mật | Áp dụng các kỹ thuật "hardening" (làm cứng) và Lockdown Mode để tăng cường an ninh cho host. |
+|---:|---|---|
+| 6A | Users & Roles (RBAC) | Phân quyền theo vai trò, tối thiểu đặc quyền |
+| 6B | Certificates & Encryption | Quản trị chứng chỉ và mã hóa workload |
+| 6C | Hardening & Lockdown | Checklist hardening + vận hành an toàn |
 
------
+---
 
-## 🚀 Bắt đầu như thế nào?
+## Bắt đầu nhanh
 
-1.  **Xem Yêu cầu:** Đảm bảo bạn có môi trường lab tối thiểu (ví dụ: 2-3 ESXi host, 1 vCenter, và storage) như mô tả trong `docs/YEU-CAU.md` 
-2.  **Học theo thứ tự:** Đi qua các bài lab từ Phần 1 đến Phần 6 để xây dựng kiến thức một cách có hệ thống.
-3.  **Đọc lý thuyết trước:** Tham khảo các file tài liệu (`vSan.md`, `vDs-vSs.md`) trong thư mục `docs/` để nắm vững lý thuyết trước khi thực hành.
-4.  **Thực hành:** Mở thư mục `labs/` và làm theo hướng dẫn chi tiết cho từng bài lab.
+1. **Clone repo**
+   ```bash
+   git clone https://github.com/urifallon/VMware-vSphere-Labs.git
+   cd VMware-vSphere-Labs
+````
 
-## 🤝 Đóng góp
+2. **Đọc tài liệu nền tảng** trong `docs/` (yêu cầu lab, network/storage plan).
+3. **Làm labs theo thứ tự** từ Phần 1 → Phần 6 trong `labs/`.
+4. **Ghi chép kết quả**: khuyến nghị tạo `notes/` (local) để lưu topology, IP plan, lỗi gặp và cách xử lý.
 
-Nếu bạn phát hiện lỗi, có ý tưởng cải tiến hoặc muốn bổ sung thêm các bài lab, vui lòng tạo một **Issue** hoặc gửi **Pull Request**\!
+---
+
+## Quy ước (để repo dễ maintain)
+
+* Mỗi lab nên có:
+
+  * **Mục tiêu** (Objective)
+  * **Prerequisites**
+  * **Steps**
+  * **Validation** (tiêu chí kiểm chứng thành công)
+  * **Rollback/Cleanup**
+  * **Troubleshooting** (lỗi thường gặp)
+
+---
+
+## Đóng góp
+
+Nếu bạn phát hiện lỗi hoặc muốn bổ sung labs:
+
+* Tạo **Issue** mô tả rõ bối cảnh + log/ảnh (nếu có)
+* Hoặc gửi **Pull Request** (nêu mục tiêu thay đổi + cách test)
+
+---
+
+## Disclaimer
+
+Repo này phục vụ **mục đích học tập và thử nghiệm**. Không liên kết chính thức với VMware/Broadcom.
+Không khuyến nghị áp dụng trực tiếp vào production nếu chưa review theo tiêu chuẩn nội bộ và tài liệu vendor.
+
+---
+
